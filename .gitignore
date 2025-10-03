@@ -1,0 +1,63 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# C extensions
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Dependencies
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data & Outputs (large/sensitive)
+data/*.csv  # Keep raw if needed; ignore processed
+outputs/
+models/
+*.pkl
+*.h5
+*.joblib
+
+# Notebooks
+*.ipynb_checkpoints/
+.ipynb
+
+# Logs
+logs/
+*.log
+
+# Temp
+temp/
+tmp/
+!data/unprocessed/archive/high_popularity_spotify_data.csv
+!data/unprocessed/archive/low_popularity_spotify_data.csv
+!data/processed/combined_spotify_data.csv
+!reports/eval_summary.csv
+notebooks/combined_spotify_data.csv
+notebooks/high_popularity_spotify_data.csv
+notebooks/low_popularity_spotify_data.csv
+notebooks/X_test_pca.csv
+notebooks/X_train_pca.csv
+notebooks/y_test.csv
+notebooks/y_train.csv
+
