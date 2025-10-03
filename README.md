@@ -24,7 +24,7 @@ Ever wondered what makes a Spotify banger blow up? Is it the thumping bass, that
 ### Clone the repo
 
 ```bash
-git clone https://github.com/yourusername/spotify-popularity-classifier.git
+git clone https://GitHub.com/KhanUzeb/Spotify-Classifier.git 
 cd spotify-popularity-classifier
 ```
 
