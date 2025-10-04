@@ -43,7 +43,7 @@ env\Scripts\activate  # Windows
 pip install -r requirements.txt
 ```
 
-### Data: Drop high_popularity_spotify_data.csv and low_popularity_spotify_data.csv into /data/
+### Data: Drop high_popularity_spotify_data.csv and low_popularity_spotify_data.csv into /data/unprocessed/archive/
 
 ## OPTION 1:NOTEBOOKS
 
