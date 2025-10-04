@@ -40,8 +40,8 @@ def split_data(df: pd.DataFrame, features: list, test_size: float = 0.2, output_
     return X_train, X_test, y_train, y_test
 
 if __name__ == "__main__":
-    high_path = 'data/high_popularity_spotify_data.csv'
-    low_path = 'data/low_popularity_spotify_data.csv'
+    high_path = 'data/unprocessed/archive/high_popularity_spotify_data.csv'
+    low_path = 'data/unprocessed/archive/low_popularity_spotify_data.csv'
     features = ['energy', 'tempo', 'danceability', 'loudness', 'liveness', 'valence', 
                 'speechiness', 'instrumentalness', 'acousticness', 'mode', 'key', 
                 'duration_ms', 'time_signature', 'release_year']

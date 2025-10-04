@@ -7,6 +7,7 @@ from sklearn.model_selection import GridSearchCV
 import optuna
 from optuna.pruners import SuccessiveHalvingPruner
 from optuna.samplers import TPESampler
+from sklearn.ensemble import VotingClassifier
 from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.model_selection import cross_val_score
 import joblib
@@ -30,7 +31,7 @@ def tune_lr(X_train, y_train, output_dir: str):
         ('model', get_base_model('lr'))
     ])
     param_grid = {'model__C': [0.01, 0.1, 1, 10, 100], 'model__solver': ['liblinear', 'lbfgs']}
-    grid = GridSearchCV(lr_pipe, param_grid, cv=5, scoring='f1_macro')
+    grid = GridSearchCV(lr_pipe, param_grid, cv=5, scoring='f1_macro',n_jobs=-1,verbose=1)
     grid.fit(X_train, y_train)
     joblib.dump(grid, f'{output_dir}/tuned_lr_smote.pkl')
     print(f"LR Best F1: {grid.best_score_:.3f}")
@@ -43,7 +44,7 @@ def tune_rf(X_train, y_train, output_dir: str):
         ('model', get_base_model('rf'))
     ])
     param_grid = {'model__n_estimators': [100, 200, 300], 'model__max_depth': [None, 10, 20], 'model__min_samples_split': [2, 5]}
-    grid = GridSearchCV(rf_pipe, param_grid, cv=5, scoring='f1_macro')
+    grid = GridSearchCV(rf_pipe, param_grid, cv=5, scoring='f1_macro',n_jobs=-1,verbose=1)
     grid.fit(X_train, y_train)
     joblib.dump(grid, f'{output_dir}/tuned_rf_smote.pkl')
     print(f"RF Best F1: {grid.best_score_:.3f}")
@@ -70,7 +71,7 @@ def tune_xgb(X_train, y_train, output_dir: str, n_trials: int = 100):
             ('model', XGBClassifier(**params, random_state=42, eval_metric='logloss', scale_pos_weight=scale_pos))
         ])
         
-        return cross_val_score(pipe, X_train, y_train, cv=5, scoring='f1_macro').mean()
+        return cross_val_score(pipe, X_train, y_train, cv=5, scoring='f1_macro',n_jobs=-1,verbose=1).mean()
     
     study = optuna.create_study(direction='maximize', sampler=TPESampler(), pruner=SuccessiveHalvingPruner())
     study.optimize(objective, n_trials=n_trials)
@@ -87,17 +88,36 @@ def tune_xgb(X_train, y_train, output_dir: str, n_trials: int = 100):
     print(f"XGB Best F1: {study.best_value:.3f}")
     return xgb_pipe
 
-def create_stacking_ensemble(lr, rf, xgb, X_train, y_train, output_dir: str):
-    """Stacking with LR meta."""
+def vote_ensemble(lr, rf, xgb, X_train, y_train, output_dir: str):
+    """Voting ensemble."""
     lr_est = lr.named_steps['model']
     rf_est = rf.named_steps['model']
     xgb_est = xgb.named_steps['model']
     
-    stacking = StackingClassifier([
+    voting = VotingClassifier([
         ('lr', lr_est),
         ('rf', rf_est),
         ('xgb', xgb_est)
-    ], final_estimator=LogisticRegression(random_state=42), cv=5)
+    ], voting='soft',weights=[1, 1, 2])
+    
+    voting.fit(X_train, y_train)
+    joblib.dump(voting, f'{output_dir}/voting_ensemble.pkl')
+    print("Voting saved")
+    return voting
+
+def create_stacking_ensemble(lr, rf, xgb, voting, X_train, y_train, output_dir: str):
+    """Stacking with LR meta, including voting as base."""
+    lr_est = lr.named_steps['model']
+    rf_est = rf.named_steps['model']
+    xgb_est = xgb.named_steps['model']
+    voting_est = voting  # Voting is already fitted estimator
+    
+    stacking = StackingClassifier([
+        ('lr', lr_est),
+        ('rf', rf_est),
+        ('xgb', xgb_est),
+        ('voting', voting_est)  # Add prebuilt voting as base
+    ], final_estimator=LogisticRegression(random_state=42), cv=5, n_jobs=-1, verbose=1)
     
     stacking.fit(X_train, y_train)
     joblib.dump(stacking, f'{output_dir}/stacking_ensemble.pkl')
@@ -113,4 +133,5 @@ if __name__ == "__main__":
     tuned_lr = tune_lr(X_train, y_train, output_dir)
     tuned_rf = tune_rf(X_train, y_train, output_dir)
     tuned_xgb = tune_xgb(X_train, y_train, output_dir)
-    create_stacking_ensemble(tuned_lr, tuned_rf, tuned_xgb, X_train, y_train, output_dir)
+    voting = vote_ensemble(tuned_lr, tuned_rf, tuned_xgb, X_train, y_train, output_dir)
+    create_stacking_ensemble(tuned_lr, tuned_rf, tuned_xgb, voting, X_train, y_train, output_dir)
