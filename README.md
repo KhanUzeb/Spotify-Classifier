@@ -51,13 +51,11 @@ pip install -r requirements.txt
 
 * 01_eda.ipynb: Explore data, spot imbalance (67% low-pop), outliers.
 
-* 02_feature_selection.ipynb: ANOVA/RFE for top feats (danceability shines!).
+* 02_feature_engineering.ipynb: Gen features (energy_dance ratio), scale, PCA (95% var in 4 dims).
 
-* 03_prep_scaling.ipynb: Gen features (energy_dance ratio), scale, PCA (95% var in 4 dims).
+* 03_modeling.ipynb: SMOTE + tuning + stacking—watch F1 climb to 0.66.
 
-* 04_modeling.ipynb: SMOTE + tuning + stacking—watch F1 climb to 0.66.
-
-* 05_evaluation.ipynb: Metrics, curves, 10-sample preds (80%+ with thresh tweak)
+* 04_evaluation.ipynb: Metrics, curves, 10-sample preds (80%+ with thresh tweak)
 
 > Run jupyter notebook and dive in—cells build on each other.
 
