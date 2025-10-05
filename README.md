@@ -12,6 +12,10 @@ This project explores what makes a Spotify track pop off versus fade into the ba
 
 * Results: Stacking ensemble: 70.2% acc, 0.664 F1-macro, 0.754 AUC. Beats baseline (67% majority class) but capped by small data—room for 10K+ tracks!
 
+## REPORTS
+
+>For ALL EVALS,SCORE & FINAL DATA VISUALIZATION SEEK REPORTS FOLDER
+
 ## INSTALLATION AND WORK
 
 ### Clone the repo
